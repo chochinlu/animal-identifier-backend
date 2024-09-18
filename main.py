@@ -88,7 +88,9 @@ async def recognize_animal(image: UploadFile = File(...)):
     - wikipediaUrl: the Wikipedia URL for the animal, or "No URL available" if it's unknown
     - isDangerous: boolean indicating if the animal is generally considered dangerous
 
-    If you can't identify the animal or if it's not a specific animal (e.g., "some other animal" or "something else"), set animalName accordingly, set confidence to a low value, description to "No description available", and wikipediaUrl to "No URL available".""")
+    If the identify_image function returns "some other animal" or "something else", use that exact phrase as the animalName. In this case, set confidence to a low value (e.g., 0.1), description to "No description available", and wikipediaUrl to "No URL available".
+
+    If you can't identify the animal or if it's not a specific animal, follow the same instructions as above.""")
     
     # print(response)
     
