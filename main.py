@@ -74,7 +74,7 @@ async def recognize_animal(image: UploadFile = File(...)):
     with open("temp_image.jpg", "wb") as buffer:
         buffer.write(await image.read())
     
-    response = agent.chat("Analyze this image: temp_image.jpg. Please respond in JSON format, including the following fields: animalName, description, isDangerous")
+    response = agent.chat("Analyze this image: temp_image.jpg. Please respond in JSON format, including the following fields: animalName, description, isDangerous, confidence (a number between 0 and 1 indicating how confident you are in the identification)")
     
     print(response)
     
@@ -87,7 +87,7 @@ async def recognize_animal(image: UploadFile = File(...)):
         animal_info = json.loads(json_content)
 
         animal_name = animal_info.get("animalName", "Unknown")
-        confidence = animal_info.get("confidence", 0.0)
+        confidence = animal_info.get("confidence", 0.5)  # use 0.5 as default confidence
         description = animal_info.get("description", "No description available")
         is_dangerous = animal_info.get("isDangerous", False)
         animal_name = animal_info.get("animalName", "Unknown")
