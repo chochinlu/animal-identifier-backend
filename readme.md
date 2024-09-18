@@ -20,10 +20,14 @@ This project is a backend service for identifying animals in images and providin
 ## Setup
 
 1. Clone the repository
+
 2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+
+```
+pip install -r requirements.txt
+```
+Note: if your system want to use CPU instead of GPU, you need to chanege the installation of torch to CPU version.
+  
 3. Set the `OPENAI_API_KEY` environment variable
 
 Linux/MacOS:
