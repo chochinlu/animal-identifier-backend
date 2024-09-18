@@ -30,7 +30,6 @@ animal_labels = [
     "kangaroo",
     "koala",
     "fish",
-    "Mola mola",
     "whale",
     "dolphin",
     "shark",

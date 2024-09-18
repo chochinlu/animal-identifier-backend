@@ -16,8 +16,14 @@ Settings.llm = OpenAI(model="gpt-4o-mini")
 wiki_tool = WikipediaToolSpec()
 
 def get_animal_info(animal_name):
-    wiki_content = wiki_tool.load_data(animal_name)
-    return wiki_content[:500] 
+    wiki_data = wiki_tool.load_data(animal_name)
+    content = wiki_data.get("content", "")
+    url = wiki_data.get("url", "")
+    
+    return {
+        "summary": content[:500],  # take the first 500 characters as the summary
+        "url": url
+    }
 
 
 def identify_image(image_path):
@@ -66,6 +72,7 @@ class AnimalRecognition(BaseModel):
     animalName: str
     confidence: float
     description: str
+    wikipediaUrl: str
     isDangerous: bool
 
 @app.post("/recognize-animal")
@@ -74,9 +81,16 @@ async def recognize_animal(image: UploadFile = File(...)):
     with open("temp_image.jpg", "wb") as buffer:
         buffer.write(await image.read())
     
-    response = agent.chat("Analyze this image: temp_image.jpg. Please respond in JSON format, including the following fields: animalName, description, isDangerous, confidence (a number between 0 and 1 indicating how confident you are in the identification)")
+    response = agent.chat("""Analyze this image: temp_image.jpg. Please respond in JSON format, including the following fields: 
+    - animalName: the name of the animal, or "Unknown" if you can't identify it
+    - confidence: a number between 0 and 1 indicating how confident you are in the identification
+    - description: a brief description of the animal, or "No description available" if it's unknown
+    - wikipediaUrl: the Wikipedia URL for the animal, or "No URL available" if it's unknown
+    - isDangerous: boolean indicating if the animal is generally considered dangerous
+
+    If you can't identify the animal or if it's not a specific animal (e.g., "some other animal" or "something else"), set animalName accordingly, set confidence to a low value, description to "No description available", and wikipediaUrl to "No URL available".""")
     
-    print(response)
+    # print(response)
     
     # parse the response
     response_text = str(response)
@@ -89,13 +103,14 @@ async def recognize_animal(image: UploadFile = File(...)):
         animal_name = animal_info.get("animalName", "Unknown")
         confidence = animal_info.get("confidence", 0.5)  # use 0.5 as default confidence
         description = animal_info.get("description", "No description available")
+        wikipedia_url = animal_info.get("wikipediaUrl", "No URL available")
         is_dangerous = animal_info.get("isDangerous", False)
-        animal_name = animal_info.get("animalName", "Unknown")
-        
+         
         return AnimalRecognition(
             animalName=animal_name,
             confidence=confidence,
             description=description,
+            wikipediaUrl=wikipedia_url,
             isDangerous=is_dangerous
         )
     else:
