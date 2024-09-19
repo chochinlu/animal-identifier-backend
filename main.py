@@ -15,13 +15,9 @@ Settings.llm = OpenAI(model="gpt-4o-mini")
 
 wiki_tool = WikipediaToolSpec()
 
+
 def get_animal_info(animal_name):
-    wiki_data = wiki_tool.load_data(animal_name)
-    if isinstance(wiki_data, str):
-        return {
-            "summary": wiki_data[:500],
-            "url": ""
-        }
+    wiki_data = wiki_tool.load_data(animal_name, auto_suggest=False)
     
     content = wiki_data.get("content", "")    
     url = wiki_data.get("url", "")
